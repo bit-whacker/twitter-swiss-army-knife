@@ -5,25 +5,38 @@ import java.io.IOException;
 
 import org.projectspinoza.twitterswissarmyknife.util.TsakResponse;
 
-import com.beust.jcommander.Parameters;
-
+import twitter4j.ResponseList;
+import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
+
+import com.beust.jcommander.Parameters;
+import com.google.gson.Gson;
 
 @Parameters(commandNames = "dumpMentionsTimeLine", commandDescription = "Authenticated user MentionsTimeLine")
 public class CommandDumpMentionsTimeLine extends BaseCommand {
 
 	@Override
 	public TsakResponse execute(Twitter twitter) throws TwitterException {
-		// TODO Auto-generated method stub
-		return null;
+	    ResponseList<Status> mentions = twitter.getMentionsTimeline();
+        int remApiLimits = mentions.getRateLimitStatus().getRemaining();
+        TsakResponse tsakResponse = new TsakResponse(remApiLimits, mentions);
+        tsakResponse.setCommandDetails(this.toString());
+        return tsakResponse;
 	}
 
-	@Override
+	@SuppressWarnings("unchecked")
+    @Override
 	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-		// TODO Auto-generated method stub
-		
+	    ResponseList<Status> mentions = (ResponseList<Status>) tsakResponse.getResponseData();
+        for (Status mention : mentions) {
+            String mentionJson = new Gson().toJson(mention);
+            writer.append(mentionJson);
+        }
 	}
 
-	
+    @Override
+    public String toString() {
+        return "CommandDumpMentionsTimeLine []";
+    }	
 }
