@@ -5,11 +5,13 @@ import java.io.IOException;
 
 import org.projectspinoza.twitterswissarmyknife.util.TsakResponse;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-
+import twitter4j.Place;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
+
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
+import com.google.gson.Gson;
 
 @Parameters(commandNames = "dumpGeoDetails", commandDescription = "geo detail of a place")
 public class CommandDumpGeoDetails extends BaseCommand {
@@ -22,15 +24,25 @@ public class CommandDumpGeoDetails extends BaseCommand {
 	public void setPlaceId(String placeId) {
 		this.placeId = placeId;
 	}
+	
 	@Override
 	public TsakResponse execute(Twitter twitter) throws TwitterException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-		// TODO Auto-generated method stub
-		
+		Place place = twitter.getGeoDetails(this.placeId);
+		int remApiLimits = place.getRateLimitStatus().getRemaining();
+		TsakResponse tsakResponse = new TsakResponse(remApiLimits, place);
+		tsakResponse.setCommandDetails(this.toString());
+		return tsakResponse;
 	}
 	
+	@Override
+	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
+	    Place place = (Place) tsakResponse.getResponseData();
+	    String placeInfo_json = new Gson().toJson(place);
+        writer.append(placeInfo_json);
+	}
+	
+    @Override
+    public String toString() {
+        return "CommandDumpGeoDetails [placeId=" + placeId + "]";
+    }
 }

@@ -2,14 +2,20 @@ package org.projectspinoza.twitterswissarmyknife.command;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.projectspinoza.twitterswissarmyknife.util.TsakResponse;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-
+import twitter4j.Paging;
+import twitter4j.ResponseList;
+import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
+
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
+import com.google.gson.Gson;
 
 @Parameters(commandNames = "dumpListStatuses", commandDescription = "list's status")
 public class CommandDumpListStatuses extends BaseCommand {
@@ -22,15 +28,37 @@ public class CommandDumpListStatuses extends BaseCommand {
 	public void setListId(long listId) {
 		this.listId = listId;
 	}
+	
 	@Override
 	public TsakResponse execute(Twitter twitter) throws TwitterException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-		// TODO Auto-generated method stub
-		
+	    List<ResponseList<Status>> listStatusesCollection = new ArrayList<ResponseList<Status>>();
+        Paging page = new Paging(1, 50);
+        int remApiLimits = 1;
+        do {
+            ResponseList<Status> listStatuses = twitter.getUserListStatuses(this.listId, page);
+            listStatusesCollection.add(listStatuses);
+            page.setPage(page.getPage() + 1);
+            remApiLimits = listStatuses.getRateLimitStatus().getRemaining();
+        } while (page.getPage() < 180 && remApiLimits > 0);
+        TsakResponse tsakResponse = new TsakResponse(remApiLimits, listStatusesCollection);
+        tsakResponse.setCommandDetails(this.toString());
+        return tsakResponse;
 	}
 	
+	@SuppressWarnings("unchecked")
+    @Override
+	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
+	    List<ResponseList<Status>> listStatuses = (List<ResponseList<Status>>) tsakResponse.getResponseData();
+        for (ResponseList<Status> statuses : listStatuses) {
+            for (Status status : statuses) {
+                String userJson = new Gson().toJson(status);
+                writer.append(userJson);
+            }
+        }
+	}
+	
+    @Override
+    public String toString() {
+        return "CommandDumpListStatuses [listId=" + listId + "]";
+    }
 }
