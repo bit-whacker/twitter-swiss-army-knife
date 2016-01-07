@@ -20,7 +20,7 @@ import com.beust.jcommander.ParameterException;
  * is the Driver class for the TwitterSwissArmyKnife utility, and contains various usage examples for this utility.
  * 
  * @author org.projectspinoza
- * @version v1.0
+ * @version v1.0.0
  *
  */
 public class Main {
@@ -92,32 +92,20 @@ public class Main {
          *
          */
 
-        /**
-         * 4: USAGE (Do you want to provide your own CommandLineDriver, DataWriter etc.? )
-         * ===============================================================================
-         * 
-         * TwitterSwissArmyKnife tsak = TwitterSwissArmyKnife.getInstance();
-         * 
-         * tsak.setCommandLineDriver(yourCommandLineDriver)
-         *     .setTsakCommand(yourTsakCommands) 
-         *     .setWriter(yourWriter) 
-         *     .set...()
-         *     .executeCommand(args).write();
-         */
 
         /**
-         * 5: USAGE (Do you want to get/analyze the original response from twitter API ?)
+         * 4: USAGE (Do you want to get/analyze the original response from twitter API ?)
          * =============================================================================
          * 
          * TwitterSwissArmyKnife tsak = TwitterSwissArmyKnife.getInstance();
          *
          * i. get the result only 
          * ------------------- 
-         * Object result = tsak.executeCommand(args).getResult();
+         * TsakResponse result = tsak.executeCommand(args).getResult();
          *
          * ii. write and then get the result
          * ---------------------------------
-         * Object result = tsak.executeCommand(args).write().getResult();
+         * TsakResponse result = tsak.executeCommand(args).write().getResult();
          *
          */
 
@@ -129,6 +117,7 @@ public class Main {
          * 
          */
     }
+    
     /**
      * reads command from the console, and returns it after parsing.
      * 

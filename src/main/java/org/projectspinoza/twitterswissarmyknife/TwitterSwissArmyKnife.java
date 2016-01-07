@@ -32,35 +32,34 @@ import twitter4j.conf.ConfigurationBuilder;
  * provides Method chaining, re-usability, flexibility and simplicity.
  * 
  * @author org.projectspinoza
- * @version v1.0
+ * @version v1.0.0
  *
  */
 public class TwitterSwissArmyKnife {
     private static Logger log = LogManager.getRootLogger();
-    private static final String COMMANDS_PACKAGE = "org.projectspinoza.twitterswissarmyknife.command";
+    private static final String COMMANDS_SCAN_PACKAGE = "org.projectspinoza.twitterswissarmyknife.command";
     private static TwitterSwissArmyKnife tsakInstance = null;
     
     private TsakCommand tsakCommand;
     private JCommander subCommander;
-    private JCommander rootCommander;
-    private String parsedCommand;
-
-    private boolean authorize;
     private TsakResponse tsakResponse;
+    
+    private boolean authorize;
 
     private ConfigurationBuilder configurationBuilder;
     private Twitter twitter;
     
     /**
-     * default Constructor for TwitterSwissArmyKnife, it prepares CommandlineDriver, tsakCommand and dataWriter, which can be override later if needed.
+     * Default private constructor for TwitterSwissArmyKnife.
+     * Prepares TsakCommand by calling its default constructor, you may reset it later.
      * 
      */
     private TwitterSwissArmyKnife() {
         tsakCommand = new TsakCommand();
     }
+    
     /**
      * returns TwitterSwissArmyKnife's static instance
-     * 
      * @return tsakInstance
      */
     public synchronized static TwitterSwissArmyKnife getInstance() {
@@ -69,9 +68,9 @@ public class TwitterSwissArmyKnife {
         }
         return tsakInstance;
     }
+    
     /**
      * returns True if user has authorization to access twitterAPI false other wise.
-     * 
      * @return authorize
      */
     public boolean isAuthorized() {
@@ -80,7 +79,6 @@ public class TwitterSwissArmyKnife {
    
     /**
      * sets OR overrides default tsakCommand.
-     * 
      * @param tsakCommands
      * @return tsakInstance
      */
@@ -89,25 +87,25 @@ public class TwitterSwissArmyKnife {
         tsakInstance.tsakCommand = tsakCommands;
         return tsakInstance;
     }
+    
     /**
-     * returns result e.g. the generated data of the executed command in Object format.
-     * 
-     * @return data
+     * returns result e.g. the generated response of the executed command. 
+     * @return tsakResponse
      */
     public TsakResponse getResult() {
         return tsakInstance.tsakResponse;
     }
+    
     /**
      * returns twitter instance
-     * 
      * @return twitter
      */
     public Twitter getTwitterInstance() {
         return twitter;
     }
+    
     /**
-     * writes the result (generated data of the executed command) to the output file.
-     *  
+     * writes the result (generated data of the executed command) to the output file.  
      * @return tsakInstance
      */
     public TwitterSwissArmyKnife write(){
@@ -117,9 +115,7 @@ public class TwitterSwissArmyKnife {
     		fw = new FileWriter(new File(bc.getOutputFile()));
     		bc.write(tsakResponse, fw);
     		tsakResponse = null;
-    		if(fw != null){
-    			fw.close();
-    		}
+    		if(fw != null){ fw.close();}
     	}catch(IOException ioex){
     		log.debug(ioex.getMessage());
     	}catch(NullPointerException npex){
@@ -127,19 +123,18 @@ public class TwitterSwissArmyKnife {
     	}
         return tsakInstance;
     }
+    
     /**
      * executes twitter streaming command.
-     * 
      * @throws IOException
      */
-    public void executeStreamingCommand() throws IOException {
+    public void executeStreamingCommand(String parsedCommand) throws IOException {
         CommandStreamStatuses streamStatuses = (CommandStreamStatuses) getSubCommand(parsedCommand);
-        (new TwitterStreamingExcecutor()).execute(configurationBuilder,
-                streamStatuses);
+        (new TwitterStreamingExcecutor()).execute(configurationBuilder, streamStatuses);
     }
+    
     /**
-     * executes dump command.
-     * 
+     * executes dump command. 
      * @throws IOException
      * @throws TwitterException
      */
@@ -156,14 +151,17 @@ public class TwitterSwissArmyKnife {
             log.error("User not authorized!");
         }
     }
+    
     /**
-     * executes (provided in the argument) command.
+     * executes the provided command.
      * 
-     * @param args
-     * @return tsakInstance
+     * @param String[] Command
+     * @return TsakInstance
      * @throws TwitterException
      * @throws ParameterException
      * @throws IOException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
      */
     public TwitterSwissArmyKnife executeCommand(String[] args)
             throws TwitterException, ParameterException, IOException, InstantiationException, IllegalAccessException {
@@ -171,25 +169,26 @@ public class TwitterSwissArmyKnife {
         	log.debug("Need help?? run > tsak <commandName> --help");
             return tsakInstance;
         }
-        rootCommander = new JCommander();
+        JCommander rootCommander = new JCommander();
         rootCommander.addCommand("tsak", tsakCommand);
         subCommander = rootCommander.getCommands().get("tsak");
         activateSubCommands();
         rootCommander.parse(args);
-        parsedCommand = subCommander.getParsedCommand();
+        String parsedCommand = subCommander.getParsedCommand();
         BaseCommand baseCommand = getSubCommand(parsedCommand);
        if(baseCommand.needHelp()){
         	subCommander.usage(parsedCommand);
         	return tsakInstance;
         }
-        setConfigurationBuilder();
+        setConfigurationBuilder(rootCommander);
         if (parsedCommand.equals("streamStatuses")) {
-            executeStreamingCommand();
+            executeStreamingCommand(parsedCommand);
         } else {
             executeDumpCommand(baseCommand);
         }
         return tsakInstance;
     }
+    
     /**
      * authorizes user with the provided credentials.
      * 
@@ -200,27 +199,29 @@ public class TwitterSwissArmyKnife {
         twitter.verifyCredentials();
         authorize = true;
     }
+    
     /**
-     * sets twitter configuration builder.
-     * 
+     * Sets twitter configuration builder
+     * @param rootCommander
      * @throws IOException
      */
-    private void setConfigurationBuilder() throws IOException {
+    private void setConfigurationBuilder(JCommander rootCommander) throws IOException {
         if (isAuthorized()) {
             return;
         }
-        if (!setCredentials()) {
+        if (!setCredentials(rootCommander)) {
             log.error("Credentials not provided!");
             authorize = false;
             return;
         }
         configurationBuilder = new ConfigurationBuilder();
         configurationBuilder.setDebugEnabled(true)
-                .setOAuthConsumerKey(tsakCommand.getConsumerKey())
-                .setOAuthConsumerSecret(tsakCommand.getConsumerSecret())
-                .setOAuthAccessToken(tsakCommand.getAccessToken())
-                .setOAuthAccessTokenSecret(tsakCommand.getAccessSecret());
+        .setOAuthConsumerKey(tsakCommand.getConsumerKey())
+        .setOAuthConsumerSecret(tsakCommand.getConsumerSecret())
+        .setOAuthAccessToken(tsakCommand.getAccessToken())
+        .setOAuthAccessTokenSecret(tsakCommand.getAccessSecret());
     }
+    
     /**
      * returns twitter configuration builder.
      * 
@@ -229,13 +230,15 @@ public class TwitterSwissArmyKnife {
     private ConfigurationBuilder getConfigurationBuilder() {
         return configurationBuilder;
     }
+    
     /**
      * sets/verifies provided twitter credentials and returns True on Success and False on Failure.
      * 
-     * @return boolean
+     * @param rootCommander
+     * @return boolean TRUE/FALSE
      * @throws IOException
      */
-    private boolean setCredentials() throws IOException {
+    private boolean setCredentials(JCommander rootCommander) throws IOException {
         if (!rootCommander.getParsedCommand().equals("tsak")) {
             log.info("Invalid Command: " + rootCommander.getParsedCommand());
             return false;
@@ -249,8 +252,7 @@ public class TwitterSwissArmyKnife {
                 log.error("Environment variable not set. TSAK_CONF {}");
                 return false;
             }
-            File propConfFile = new File(env_var + File.separator
-                    + "tsak.properties");
+            File propConfFile = new File(env_var + File.separator + "tsak.properties");
             if (!propConfFile.exists()) {
                 log.error("tsak.properties file does not exist in: " + env_var);
                 return false;
@@ -260,37 +262,41 @@ public class TwitterSwissArmyKnife {
             prop.load(propInstream);
             propInstream.close();
             tsakCommand.setConsumerKey(prop.getProperty("consumerKey").trim());
-            tsakCommand.setConsumerSecret(prop.getProperty("consumerSecret")
-                    .trim());
+            tsakCommand.setConsumerSecret(prop.getProperty("consumerSecret").trim());
             tsakCommand.setAccessToken(prop.getProperty("accessToken").trim());
-            tsakCommand
-                    .setAccessSecret(prop.getProperty("accessSecret").trim());
+            tsakCommand.setAccessSecret(prop.getProperty("accessSecret").trim());
         }
         return true;
     }
+    
     /**
      * activates/prepares all of the commands for execution.
      * 
      */
     public void activateSubCommands() throws InstantiationException, IllegalAccessException{
-    	Reflections reflections = new Reflections(COMMANDS_PACKAGE);
+    	Reflections reflections = new Reflections(COMMANDS_SCAN_PACKAGE);
     	Set<Class<? extends BaseCommand>> tsakCommandSet = reflections.getSubTypesOf(BaseCommand.class);
     	for (Class<?> commandClazz : tsakCommandSet) {
     		this.subCommander.addCommand(commandClazz.newInstance());
     	}
     }
+    
     /**
      * returns parsedCommand e.g. the provided command.
      * 
      * @param parsedCommand
-     * @return subCommand
+     * @return BaseCommand
      */
     public BaseCommand getSubCommand(String parsedCommand) {
         return (BaseCommand) subCommander.getCommands().get(parsedCommand).getObjects().get(0);
     }
+    /**
+     * prints RateLimitStatus for specific command.
+     * @param remApiLimits
+     */
     public void showRateLimitStatus(int remApiLimits) {
         log.info("---------------------------------------------------");
-        log.info("REMAINING TWITTER API CALLS: [" + remApiLimits + "]");
+        log.info("DONE!!! REMAINING TWITTER API CALLS: [" + remApiLimits + "]");
         log.info("---------------------------------------------------");
     }
 }
