@@ -93,7 +93,7 @@ public class TwitterSwissArmyKnife {
      * @return tsakResponse
      */
     public TsakResponse getResult() {
-        return tsakInstance.tsakResponse;
+        return tsakResponse;
     }
     
     /**
@@ -139,11 +139,11 @@ public class TwitterSwissArmyKnife {
      * @throws TwitterException
      */
     public void executeDumpCommand(BaseCommand baseCommand) throws TwitterException {
-        if (!isAuthorized()) {
+    	if (!isAuthorized()) {
             authorizeUser();
         }
         if (isAuthorized()) {
-            tsakResponse = baseCommand.execute(twitter);
+            tsakResponse = baseCommand.execute(getTwitterInstance());
             if(tsakResponse != null){
             	showRateLimitStatus(tsakResponse.getRemApiLimits());
             }
@@ -179,14 +179,16 @@ public class TwitterSwissArmyKnife {
        if(baseCommand.needHelp()){
         	subCommander.usage(parsedCommand);
         	return tsakInstance;
-        }
-        setConfigurationBuilder(rootCommander);
-        if (parsedCommand.equals("streamStatuses")) {
-            executeStreamingCommand(parsedCommand);
-        } else {
-            executeDumpCommand(baseCommand);
-        }
-        return tsakInstance;
+       }
+       if (!isAuthorized()) {
+    	   setConfigurationBuilder(rootCommander);
+       }
+       if (parsedCommand.equals("streamStatuses")) {
+           executeStreamingCommand(parsedCommand);
+       } else {
+           executeDumpCommand(baseCommand);
+       }
+       return tsakInstance;
     }
     
     /**
@@ -206,9 +208,6 @@ public class TwitterSwissArmyKnife {
      * @throws IOException
      */
     private void setConfigurationBuilder(JCommander rootCommander) throws IOException {
-        if (isAuthorized()) {
-            return;
-        }
         if (!setCredentials(rootCommander)) {
             log.error("Credentials not provided!");
             authorize = false;
