@@ -5,11 +5,14 @@ import java.io.IOException;
 
 import org.projectspinoza.twitterswissarmyknife.util.TsakResponse;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-
+import twitter4j.ResponseList;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
+import twitter4j.User;
+
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
+import com.google.gson.Gson;
 
 @Parameters(commandNames = "dumpMemberSuggestions", commandDescription = "member's suggestions")
 public class CommandDumpMemberSuggestions extends BaseCommand {
@@ -22,15 +25,28 @@ public class CommandDumpMemberSuggestions extends BaseCommand {
 	public void setSlug(String slug) {
 		this.slug = slug;
 	}
+	
 	@Override
 	public TsakResponse execute(Twitter twitter) throws TwitterException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-		// TODO Auto-generated method stub
-		
+		ResponseList<User> suggestions = twitter.getMemberSuggestions(this.slug);
+		int remApiLimits = suggestions.getRateLimitStatus().getRemaining();
+		TsakResponse tsakResponse = new TsakResponse(remApiLimits, suggestions);
+        tsakResponse.setCommandDetails(this.toString());
+        return tsakResponse;
 	}
 	
+	@SuppressWarnings("unchecked")
+    @Override
+	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
+	    ResponseList<User> users = (ResponseList<User>) tsakResponse.getResponseData();
+	    for (User user : users) {
+            String userJson = new Gson().toJson(user);
+            writer.append(userJson);
+        }
+	}
+	
+    @Override
+    public String toString() {
+        return "CommandDumpMemberSuggestions [slug=" + slug + "]";
+    }	
 }

@@ -53,7 +53,7 @@ public class CommandDumpFriendIDs extends BaseCommand {
 	@Override
 	public TsakResponse execute(Twitter twitter) throws TwitterException {
 	    List<IDs> friendsIDsCollection = new ArrayList<IDs>();
-        int userLimit = this.getLimit();
+        int userLimit = this.limit;
         int remApiLimits = 0;
         long cursor = -1;
         do {

@@ -51,8 +51,8 @@ public class CommandDumpListStatuses extends BaseCommand {
 	    List<ResponseList<Status>> listStatuses = (List<ResponseList<Status>>) tsakResponse.getResponseData();
         for (ResponseList<Status> statuses : listStatuses) {
             for (Status status : statuses) {
-                String userJson = new Gson().toJson(status);
-                writer.append(userJson);
+                String listJson = new Gson().toJson(status);
+                writer.append(listJson);
             }
         }
 	}

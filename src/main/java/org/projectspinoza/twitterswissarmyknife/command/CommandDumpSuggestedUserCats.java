@@ -5,25 +5,38 @@ import java.io.IOException;
 
 import org.projectspinoza.twitterswissarmyknife.util.TsakResponse;
 
-import com.beust.jcommander.Parameters;
-
+import twitter4j.Category;
+import twitter4j.ResponseList;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
+
+import com.beust.jcommander.Parameters;
+import com.google.gson.Gson;
 
 @Parameters(commandNames = "dumpSugeestedUserCats", commandDescription = "sugeested user categories")
 public class CommandDumpSuggestedUserCats extends BaseCommand {
 
 	@Override
 	public TsakResponse execute(Twitter twitter) throws TwitterException {
-		// TODO Auto-generated method stub
-		return null;
+		ResponseList<Category> userCategories = twitter.getSuggestedUserCategories();
+		int remApiLimits= userCategories.getRateLimitStatus().getRemaining();
+		TsakResponse tsakResponse = new TsakResponse(remApiLimits, userCategories);
+		tsakResponse.setCommandDetails(this.toString());
+        return tsakResponse;
 	}
 
-	@Override
+	@SuppressWarnings("unchecked")
+    @Override
 	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-		// TODO Auto-generated method stub
-		
+	    ResponseList<Category> categories = (ResponseList<Category>) tsakResponse.getResponseData();
+        for (Category category : categories) {
+            String categoryjson = new Gson().toJson(category);
+            writer.append(categoryjson);
+        }
 	}
 
-	
+    @Override
+    public String toString() {
+        return "CommandDumpSuggestedUserCats []";
+    }	
 }
