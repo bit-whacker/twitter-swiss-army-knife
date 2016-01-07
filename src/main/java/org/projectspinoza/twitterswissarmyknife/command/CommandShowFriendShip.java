@@ -5,11 +5,13 @@ import java.io.IOException;
 
 import org.projectspinoza.twitterswissarmyknife.util.TsakResponse;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-
+import twitter4j.Relationship;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
+
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
+import com.google.gson.Gson;
 
 @Parameters(commandNames = "showFriendShip", commandDescription = "finding friendship between two users")
 public class CommandShowFriendShip extends BaseCommand {
@@ -32,13 +34,34 @@ public class CommandShowFriendShip extends BaseCommand {
 	}
 	@Override
 	public TsakResponse execute(Twitter twitter) throws TwitterException {
-		// TODO Auto-generated method stub
-		return null;
+		Relationship relationship;
+		int remApiLimits = 0;
+		if (isLong(this.source) && isLong(this.target)) {
+		    relationship = twitter.showFriendship(
+                    Long.parseLong(this.source),
+                    Long.parseLong(this.target));
+		    remApiLimits = relationship.getRateLimitStatus().getRemaining();
+        } else {
+            relationship = twitter.showFriendship(this.source,this.target);
+            remApiLimits = relationship.getRateLimitStatus().getRemaining();
+        }
+		TsakResponse tsakResponse = new TsakResponse(remApiLimits, relationship);
+        tsakResponse.setCommandDetails(this.toString());
+        return tsakResponse;
 	}
 	@Override
 	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-		// TODO Auto-generated method stub
-		
+	    Relationship relationship = (Relationship) tsakResponse.getResponseData();
+	    String relationshipjson = new Gson().toJson(relationship);
+        writer.append(relationshipjson);
 	}
 	
+	private boolean isLong(String input) {
+        try {
+            Long.parseLong(input);
+        } catch (ClassCastException | NumberFormatException ex) {
+            return false;
+        }
+        return true;
+    }
 }

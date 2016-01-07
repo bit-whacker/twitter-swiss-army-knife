@@ -5,11 +5,16 @@ import java.io.IOException;
 
 import org.projectspinoza.twitterswissarmyknife.util.TsakResponse;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-
+import twitter4j.GeoLocation;
+import twitter4j.GeoQuery;
+import twitter4j.Place;
+import twitter4j.ResponseList;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
+
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
+import com.google.gson.Gson;
 
 @Parameters(commandNames = "searchPlace", commandDescription = "search places")
 public class CommandSearchPlace extends BaseCommand {
@@ -31,13 +36,27 @@ public class CommandSearchPlace extends BaseCommand {
 	}
 	@Override
 	public TsakResponse execute(Twitter twitter) throws TwitterException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-		// TODO Auto-generated method stub
-		
+		ResponseList<Place> places = twitter.searchPlaces(new GeoQuery(new GeoLocation(
+                this.latitude, this.longitude)));
+		int remApiLimits = places.getRateLimitStatus().getRemaining();
+		TsakResponse tsakResponse = new TsakResponse(remApiLimits, places);
+        tsakResponse.setCommandDetails(this.toString());
+        return tsakResponse;
 	}
 	
+	@SuppressWarnings("unchecked")
+    @Override
+	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
+	    ResponseList<Place> places = (ResponseList<Place>) tsakResponse.getResponseData();
+        for (Place place : places) {
+            String placejson = new Gson().toJson(place);
+            writer.append(placejson);
+        }
+	}
+	
+    @Override
+    public String toString() {
+        return "CommandSearchPlace [latitude=" + latitude + ", longitude="
+                + longitude + "]";
+    }
 }
