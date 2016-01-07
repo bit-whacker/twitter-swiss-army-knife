@@ -17,9 +17,8 @@ public class CommandDumpAccountSettings extends BaseCommand {
 
 	@Override
 	public TsakResponse execute(Twitter twitter) throws TwitterException {
-	    int remApiLimits = 0;
 	    AccountSettings settings = twitter.getAccountSettings();
-	    remApiLimits = settings.getRateLimitStatus().getRemaining();
+	    int remApiLimits = settings.getRateLimitStatus().getRemaining();
 	    TsakResponse tsakResponse = new TsakResponse(remApiLimits, settings);
         tsakResponse.setCommandDetails(this.toString());
         return tsakResponse;
@@ -27,7 +26,7 @@ public class CommandDumpAccountSettings extends BaseCommand {
 
 	@Override
 	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-	    String jsonSettings = new Gson().toJson(tsakResponse);
+	    String jsonSettings = new Gson().toJson(tsakResponse.getResponseData());
         writer.append(jsonSettings);
 	}
 
