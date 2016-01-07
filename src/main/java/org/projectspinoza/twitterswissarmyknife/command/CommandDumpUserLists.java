@@ -5,11 +5,14 @@ import java.io.IOException;
 
 import org.projectspinoza.twitterswissarmyknife.util.TsakResponse;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-
+import twitter4j.ResponseList;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
+import twitter4j.UserList;
+
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
+import com.google.gson.Gson;
 
 @Parameters(commandNames = "dumpUserLists", commandDescription = "user's lists")
 public class CommandDumpUserLists extends BaseCommand {
@@ -30,15 +33,30 @@ public class CommandDumpUserLists extends BaseCommand {
 	public void setUserId(long userId) {
 		this.userId = userId;
 	}
+	
 	@Override
 	public TsakResponse execute(Twitter twitter) throws TwitterException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-		// TODO Auto-generated method stub
-		
+	    ResponseList<UserList> userLists = this.screenName == null ? twitter
+                .getUserLists(this.userId) : twitter.getUserLists(this.screenName);
+        int remApiLimits = userLists.getRateLimitStatus().getRemaining();
+        TsakResponse tsakResponse = new TsakResponse(remApiLimits, userLists);
+        tsakResponse.setCommandDetails(this.toString());
+        return tsakResponse;
 	}
 	
+	@SuppressWarnings("unchecked")
+    @Override
+	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
+	    ResponseList<UserList> userLists = (ResponseList<UserList>) tsakResponse.getResponseData();
+	    for (UserList list : userLists) {
+            String listJson = new Gson().toJson(list);
+            writer.append(listJson);
+        }
+	}
+	
+    @Override
+    public String toString() {
+        return "CommandDumpUserLists [screenName=" + screenName + ", userId="
+                + userId + "]";
+    }
 }
