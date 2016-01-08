@@ -25,8 +25,7 @@ public class CommandDumpAccountSettings extends BaseCommand {
     }
 
     @Override
-    public void write(TsakResponse tsakResponse, BufferedWriter writer)
-            throws IOException {
+    public void write(TsakResponse tsakResponse, BufferedWriter writer) throws IOException {
         String jsonSettings = new Gson().toJson(tsakResponse.getResponseData());
         writer.append(jsonSettings);
         writer.newLine();
