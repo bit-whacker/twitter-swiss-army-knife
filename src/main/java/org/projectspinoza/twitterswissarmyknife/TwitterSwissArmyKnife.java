@@ -151,9 +151,8 @@ public class TwitterSwissArmyKnife {
      * 
      * @throws IOException
      */
-    public void executeStreamingCommand(String parsedCommand) throws IOException {
-        CommandStreamStatuses streamStatuses = (CommandStreamStatuses) getSubCommand(parsedCommand);
-        (new TwitterStreamingExcecutor()).execute(configurationBuilder, streamStatuses);
+    public void executeStreamingCommand(CommandStreamStatuses baseCommand) throws IOException {
+        (new TwitterStreamingExcecutor()).execute(configurationBuilder, baseCommand);
     }
 
     /**
@@ -208,7 +207,7 @@ public class TwitterSwissArmyKnife {
             setConfigurationBuilder(rootCommander);
         }
         if (parsedCommand.equals("streamStatuses")) {
-            executeStreamingCommand(parsedCommand);
+            executeStreamingCommand( (CommandStreamStatuses) baseCommand);
         } else {
             executeDumpCommand(baseCommand);
         }

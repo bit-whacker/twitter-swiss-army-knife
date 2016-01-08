@@ -1,11 +1,13 @@
 package org.projectspinoza.twitterswissarmyknife.streaming;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.projectspinoza.twitterswissarmyknife.command.CommandStreamStatuses;
-import org.projectspinoza.twitterswissarmyknife.writer.TsakResponseWriter;
 
 import jline.console.ConsoleReader;
 import twitter4j.FilterQuery;
@@ -24,7 +26,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class TwitterStreamingExcecutor {
     private static Logger log = LogManager.getRootLogger();
     private TwitterStream twitterStream;
-
+    
     /**
      * executes twitter streaming command.
      * 
@@ -33,15 +35,35 @@ public class TwitterStreamingExcecutor {
      * @throws IOException
      */
     public void execute(ConfigurationBuilder configurationBuilder, CommandStreamStatuses streamStatuses) throws IOException {
+        BufferedWriter writer = null;
+        try {
 
-        TsakResponseWriter responseWriter = new TsakResponseWriter(streamStatuses.getOutputFile());
-        streamedStatuses(configurationBuilder, streamStatuses, responseWriter);
-        final ConsoleReader reader = new ConsoleReader();
-        while (true) {
-            String commandLine = reader.readLine();
-            if (commandLine.trim().equals("exit")) {
-                twitterStream.clearListeners();
-                twitterStream.shutdown();
+            writer = new BufferedWriter(new FileWriter(new File(streamStatuses.getOutputFile())));
+            streamedStatuses(configurationBuilder, streamStatuses, writer);
+            final ConsoleReader reader = new ConsoleReader();
+            boolean run = true;
+            while (run) {
+                String commandLine = reader.readLine();
+                if (commandLine.trim().equals("exit")) {
+                    run = false;
+                    twitterStream.clearListeners();
+                    twitterStream.shutdown();
+                    if (writer != null) {
+                        writer.flush();
+                        writer.close();
+                    }
+                }
+            }
+        } catch (IOException ioex) {
+            log.error(ioex.getMessage());
+            log.error(ioex.getCause());
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException ex) {
+                    // .
+                }
             }
         }
     }
@@ -53,18 +75,17 @@ public class TwitterStreamingExcecutor {
      * @param streamStatuses
      * @param responseWriter
      */
-    private void streamedStatuses(ConfigurationBuilder configurationBuilder, CommandStreamStatuses streamStatuses, TsakResponseWriter responseWriter) {
+    private void streamedStatuses(ConfigurationBuilder configurationBuilder, CommandStreamStatuses streamStatuses, BufferedWriter writer) {
         String keywords = streamStatuses.getKeywords();
         String keywordsArray[] = keywords.split(",");
-        if (streamStatuses.getStoreStreamingStatus().equals("true") || streamStatuses.getStoreStreamingStatus().equals("false")) {
-            twitterStream = new TwitterStreamFactory(configurationBuilder.build()).getInstance();
-            TwitterStatusStreams statusStreams = new TwitterStatusStreams(keywordsArray, Boolean.parseBoolean(streamStatuses.getStoreStreamingStatus()), responseWriter);
-            FilterQuery filterQuery = new FilterQuery();
-            filterQuery.track(keywordsArray);
-            twitterStream.addListener(statusStreams);
-            twitterStream.filter(filterQuery);
-        } else {
-            log.error("Error command argument. -store expects true|false found {}", streamStatuses.getStoreStreamingStatus());
-        }
+
+        twitterStream = new TwitterStreamFactory(configurationBuilder.build()).getInstance();
+        TwitterStatusStreams statusStreams = new TwitterStatusStreams(keywordsArray, streamStatuses.storeStreaming(),
+                writer);
+
+        FilterQuery filterQuery = new FilterQuery();
+        filterQuery.track(keywordsArray);
+        twitterStream.addListener(statusStreams);
+        twitterStream.filter(filterQuery);
     }
 }
