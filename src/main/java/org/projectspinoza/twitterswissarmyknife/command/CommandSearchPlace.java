@@ -1,6 +1,6 @@
 package org.projectspinoza.twitterswissarmyknife.command;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.projectspinoza.twitterswissarmyknife.util.TsakResponse;
@@ -22,38 +22,44 @@ public class CommandSearchPlace extends BaseCommand {
     private Double latitude;
     @Parameter(names = "-long", description = "longitude", required = true)
     private Double longitude;
-	public Double getLatitude() {
-		return latitude;
-	}
-	public void setLatitude(Double latitude) {
-		this.latitude = latitude;
-	}
-	public Double getLongitude() {
-		return longitude;
-	}
-	public void setLongitude(Double longitude) {
-		this.longitude = longitude;
-	}
-	@Override
-	public TsakResponse execute(Twitter twitter) throws TwitterException {
-		ResponseList<Place> places = twitter.searchPlaces(new GeoQuery(new GeoLocation(
-                this.latitude, this.longitude)));
-		int remApiLimits = places.getRateLimitStatus().getRemaining();
-		TsakResponse tsakResponse = new TsakResponse(remApiLimits, places);
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    @Override
+    public TsakResponse execute(Twitter twitter) throws TwitterException {
+        ResponseList<Place> places = twitter.searchPlaces(new GeoQuery(
+                       new GeoLocation(this.latitude, this.longitude)));
+        int remApiLimits = places.getRateLimitStatus().getRemaining();
+        TsakResponse tsakResponse = new TsakResponse(remApiLimits, places);
         tsakResponse.setCommandDetails(this.toString());
         return tsakResponse;
-	}
-	
-	@SuppressWarnings("unchecked")
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
-	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-	    ResponseList<Place> places = (ResponseList<Place>) tsakResponse.getResponseData();
+    public void write(TsakResponse tsakResponse, BufferedWriter writer) throws IOException {
+        ResponseList<Place> places = (ResponseList<Place>) tsakResponse.getResponseData();
         for (Place place : places) {
             String placejson = new Gson().toJson(place);
             writer.append(placejson);
+            writer.newLine();
         }
-	}
-	
+    }
+
     @Override
     public String toString() {
         return "CommandSearchPlace [latitude=" + latitude + ", longitude="

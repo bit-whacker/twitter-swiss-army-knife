@@ -1,6 +1,6 @@
 package org.projectspinoza.twitterswissarmyknife.command;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.projectspinoza.twitterswissarmyknife.util.TsakResponse;
@@ -20,43 +20,47 @@ public class CommandShowFriendShip extends BaseCommand {
     @Parameter(names = "-tuser", description = "target username", required = true)
     private String target;
 
-	public String getSource() {
-		return source;
-	}
-	public void setSource(String source) {
-		this.source = source;
-	}
-	public String getTarget() {
-		return target;
-	}
-	public void setTarget(String target) {
-		this.target = target;
-	}
-	@Override
-	public TsakResponse execute(Twitter twitter) throws TwitterException {
-		Relationship relationship;
-		int remApiLimits = 0;
-		if (isLong(this.source) && isLong(this.target)) {
-		    relationship = twitter.showFriendship(
-                    Long.parseLong(this.source),
-                    Long.parseLong(this.target));
-		    remApiLimits = relationship.getRateLimitStatus().getRemaining();
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
+    }
+
+    @Override
+    public TsakResponse execute(Twitter twitter) throws TwitterException {
+        Relationship relationship;
+        int remApiLimits = 0;
+        if (isLong(this.source) && isLong(this.target)) {
+            relationship = twitter.showFriendship(Long.parseLong(this.source),Long.parseLong(this.target));
+            remApiLimits = relationship.getRateLimitStatus().getRemaining();
         } else {
-            relationship = twitter.showFriendship(this.source,this.target);
+            relationship = twitter.showFriendship(this.source, this.target);
             remApiLimits = relationship.getRateLimitStatus().getRemaining();
         }
-		TsakResponse tsakResponse = new TsakResponse(remApiLimits, relationship);
+        TsakResponse tsakResponse = new TsakResponse(remApiLimits, relationship);
         tsakResponse.setCommandDetails(this.toString());
         return tsakResponse;
-	}
-	@Override
-	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-	    Relationship relationship = (Relationship) tsakResponse.getResponseData();
-	    String relationshipjson = new Gson().toJson(relationship);
+    }
+
+    @Override
+    public void write(TsakResponse tsakResponse, BufferedWriter writer) throws IOException {
+        Relationship relationship = (Relationship) tsakResponse.getResponseData();
+        String relationshipjson = new Gson().toJson(relationship);
         writer.append(relationshipjson);
-	}
-	
-	private boolean isLong(String input) {
+        writer.newLine();
+    }
+
+    private boolean isLong(String input) {
         try {
             Long.parseLong(input);
         } catch (ClassCastException | NumberFormatException ex) {

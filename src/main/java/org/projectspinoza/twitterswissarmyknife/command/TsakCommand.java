@@ -18,24 +18,31 @@ public class TsakCommand {
     public String getConsumerKey() {
         return consumerKey;
     }
+
     public void setConsumerKey(String key) {
         consumerKey = key;
     }
+
     public String getConsumerSecret() {
         return consumerSecret;
     }
+
     public void setConsumerSecret(String key) {
         consumerSecret = key;
     }
+
     public String getAccessToken() {
         return accessToken;
     }
+
     public void setAccessToken(String token) {
         accessToken = token;
     }
+
     public String getAccessSecret() {
         return accessSecret;
     }
+
     public void setAccessSecret(String key) {
         accessSecret = key;
     }
