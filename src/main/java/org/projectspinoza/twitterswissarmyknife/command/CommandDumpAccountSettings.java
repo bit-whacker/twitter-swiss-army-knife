@@ -15,20 +15,20 @@ import com.google.gson.Gson;
 @Parameters(commandNames = "dumpAccountSettings", commandDescription = "Account Setting")
 public class CommandDumpAccountSettings extends BaseCommand {
 
-	@Override
-	public TsakResponse execute(Twitter twitter) throws TwitterException {
-	    AccountSettings settings = twitter.getAccountSettings();
-	    int remApiLimits = settings.getRateLimitStatus().getRemaining();
-	    TsakResponse tsakResponse = new TsakResponse(remApiLimits, settings);
+    @Override
+    public TsakResponse execute(Twitter twitter) throws TwitterException {
+        AccountSettings settings = twitter.getAccountSettings();
+        int remApiLimits = settings.getRateLimitStatus().getRemaining();
+        TsakResponse tsakResponse = new TsakResponse(remApiLimits, settings);
         tsakResponse.setCommandDetails(this.toString());
         return tsakResponse;
-	}
+    }
 
-	@Override
-	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-	    String jsonSettings = new Gson().toJson(tsakResponse.getResponseData());
+    @Override
+    public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
+        String jsonSettings = new Gson().toJson(tsakResponse.getResponseData());
         writer.append(jsonSettings);
-	}
+    }
 
     @Override
     public String toString() {

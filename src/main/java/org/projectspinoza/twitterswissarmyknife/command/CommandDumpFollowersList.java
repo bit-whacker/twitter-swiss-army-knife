@@ -24,34 +24,41 @@ public class CommandDumpFollowersList extends BaseCommand {
     private long userId;
     @Parameter(names = "-limit", description = "Authenticated user api calls limit")
     private int limit = 1;
-	public String getScreenName() {
-		return screenName;
-	}
-	public void setScreenName(String screenName) {
-		this.screenName = screenName;
-	}
-	public long getUserId() {
-		return userId;
-	}
-	public void setUserId(long userid) {
-		this.userId = userid;
-	}
-	public int getLimit() {
-		return limit;
-	}
-	public void setLimit(int limit) {
-		this.limit = limit;
-	}
-	
-	@Override
-	public TsakResponse execute(Twitter twitter) throws TwitterException {
-	    List<PagableResponseList<User>> followersList = new ArrayList<PagableResponseList<User>>();
-	    int userLimit = this.getLimit();
+
+    public String getScreenName() {
+        return screenName;
+    }
+
+    public void setScreenName(String screenName) {
+        this.screenName = screenName;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userid) {
+        this.userId = userid;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
+    @Override
+    public TsakResponse execute(Twitter twitter) throws TwitterException {
+        List<PagableResponseList<User>> followersList = new ArrayList<PagableResponseList<User>>();
+        int userLimit = this.getLimit();
         int remApiLimits = 0;
         long cursor = -1;
         do {
-            PagableResponseList<User> users = this.screenName != null ? twitter.getFollowersList(
-                        this.screenName, cursor) : twitter.getFollowersList(this.userId, cursor);
+            PagableResponseList<User> users = this.screenName != null ? twitter
+                    .getFollowersList(this.screenName, cursor) : twitter
+                    .getFollowersList(this.userId, cursor);
             followersList.add(users);
             cursor = users.getNextCursor();
             remApiLimits = users.getRateLimitStatus().getRemaining();
@@ -59,22 +66,24 @@ public class CommandDumpFollowersList extends BaseCommand {
         TsakResponse tsakResponse = new TsakResponse(remApiLimits, followersList);
         tsakResponse.setCommandDetails(this.toString());
         return tsakResponse;
-	}
-	
-	@SuppressWarnings("unchecked")
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
-	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-	    List<PagableResponseList<User>> followersList = (List<PagableResponseList<User>>) tsakResponse.getResponseData();
-	    for (PagableResponseList<User> users : followersList) {
+    public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
+        List<PagableResponseList<User>> followersList = (List<PagableResponseList<User>>) tsakResponse
+                .getResponseData();
+        for (PagableResponseList<User> users : followersList) {
             for (User user : users) {
                 String userJson = new Gson().toJson(user);
                 writer.append(userJson);
             }
         }
-	}
+    }
+
     @Override
     public String toString() {
         return "CommandDumpFollowersList [screenName=" + screenName
                 + ", userId=" + userId + ", limit=" + limit + "]";
-    } 
+    }
 }

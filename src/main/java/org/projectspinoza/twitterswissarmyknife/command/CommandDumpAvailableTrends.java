@@ -16,24 +16,24 @@ import twitter4j.TwitterException;
 @Parameters(commandNames = "dumpAvailableTrends", commandDescription = "twitter available trends")
 public class CommandDumpAvailableTrends extends BaseCommand {
 
-	@Override
-	public TsakResponse execute(Twitter twitter) throws TwitterException {
-		ResponseList<Location> locations= twitter.getAvailableTrends();
-		int remApiLimits = locations.getRateLimitStatus().getRemaining();
-		TsakResponse tsakResponse = new TsakResponse(remApiLimits, locations);
+    @Override
+    public TsakResponse execute(Twitter twitter) throws TwitterException {
+        ResponseList<Location> locations = twitter.getAvailableTrends();
+        int remApiLimits = locations.getRateLimitStatus().getRemaining();
+        TsakResponse tsakResponse = new TsakResponse(remApiLimits, locations);
         tsakResponse.setCommandDetails(this.toString());
         return tsakResponse;
-	}
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
+    @SuppressWarnings("unchecked")
+    @Override
+    public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
         ResponseList<Location> locations = (ResponseList<Location>) tsakResponse.getResponseData();
-	    for (Location location : locations) {
+        for (Location location : locations) {
             String jsonLocation = new Gson().toJson(location);
             writer.append(jsonLocation);
         }
-	}
+    }
 
     @Override
     public String toString() {
