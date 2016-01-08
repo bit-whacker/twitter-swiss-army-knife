@@ -16,16 +16,17 @@ import twitter4j.TwitterException;
 import com.beust.jcommander.ParameterException;
 
 /**
- * Main
- * is the Driver class for the TwitterSwissArmyKnife utility, and contains various usage examples for this utility.
+ * Main is the Driver class for the TwitterSwissArmyKnife utility, and contains
+ * various usage examples for this utility.
  * 
  * @author org.projectspinoza
  * @version v1.0.0
- *
+ * 
  */
 public class Main {
     private static Logger log = LogManager.getRootLogger();
     private static ConsoleReader consoleReader;
+
     /**
      * contains the logic for executing commands.
      * 
@@ -38,8 +39,7 @@ public class Main {
         /**
          * TSAK USAGE
          * 
-         * 1. USAGE (NORMAL|SIMPLE) 
-         * =======================================
+         * 1. USAGE (NORMAL|SIMPLE) =======================================
          * TwitterSwissArmyKnife tsak = TwitterSwissArmyKnife.getInstance();
          * tsak.executeCommand(args).write();
          */
@@ -47,8 +47,7 @@ public class Main {
         /**
          * TSAK USAGE
          * 
-         * 2. Using TSAK as a shell 
-         * ===================================
+         * 2. Using TSAK as a shell ===================================
          * 
          */
         consoleReader = new ConsoleReader();
@@ -76,48 +75,47 @@ public class Main {
          * multiple commands in a loop?)
          * ===================================================================
          * 
-         * String[] followersCommand = {"tsak","dumpFollowerIDs","-uname", "dmkavanagh", "-o", "followersIds.txt"}; 
-         * String[] userListsCommand = {"tsak", "dumpUserLists", "-uname", "dmkavanagh", "-o", "userLists.txt"};
-         * String[] userSuggestionsCommand = {"tsak", "dumpUserSuggestions", "-slug", "Sports", "-o", "userSuggestions.txt"};
-         *
+         * String[] followersCommand = {"tsak","dumpFollowerIDs","-uname",
+         * "dmkavanagh", "-o", "followersIds.txt"}; String[] userListsCommand =
+         * {"tsak", "dumpUserLists", "-uname", "dmkavanagh", "-o",
+         * "userLists.txt"}; String[] userSuggestionsCommand = {"tsak",
+         * "dumpUserSuggestions", "-slug", "Sports", "-o",
+         * "userSuggestions.txt"};
+         * 
          * List<String[]> commands = new ArrayList<String[]>();
-         * commands.add(followersCommand); 
-         * commands.add(userListsCommand);
+         * commands.add(followersCommand); commands.add(userListsCommand);
          * commands.add(userSuggestionsCommand);
-         *
-         * TwitterSwissArmyKnife tsak = TwitterSwissArmyKnife.getInstance();
-         * for(String[] command : commands){
-         *      tsak.executeCommand(command).write(); 
-         * }
-         *
-         */
-
-
-        /**
-         * 4: USAGE (Do you want to get/analyze the original response from twitter API ?)
-         * =============================================================================
          * 
          * TwitterSwissArmyKnife tsak = TwitterSwissArmyKnife.getInstance();
-         *
-         * i. get the result only 
-         * ------------------- 
-         * TsakResponse result = tsak.executeCommand(args).getResult();
-         *
-         * ii. write and then get the result
-         * ---------------------------------
-         * TsakResponse result = tsak.executeCommand(args).write().getResult();
-         *
+         * for(String[] command : commands){
+         * tsak.executeCommand(command).write(); }
+         * 
          */
 
         /**
-         * 5: USAGE (much more) 
-         * ====================
+         * 4: USAGE (Do you want to get/analyze the original response from
+         * twitter API ?)
+         * ========================================================
+         * =====================
+         * 
+         * TwitterSwissArmyKnife tsak = TwitterSwissArmyKnife.getInstance();
+         * 
+         * i. get the result only ------------------- TsakResponse result =
+         * tsak.executeCommand(args).getResult();
+         * 
+         * ii. write and then get the result ---------------------------------
+         * TsakResponse result = tsak.executeCommand(args).write().getResult();
+         * 
+         */
+
+        /**
+         * 5: USAGE (much more) ====================
          * 
          * for more detailed usage study the API. (TwitterSwissArmyKnife)
          * 
          */
     }
-    
+
     /**
      * reads command from the console, and returns it after parsing.
      * 

@@ -64,13 +64,14 @@ import twitter4j.User;
 import twitter4j.UserList;
 
 /**
- * CLIDriver
- * contains all of the command line logic e.g. identifying the command, executing and returning its result.
- * it also shows the rateLimitStatus e.g. the remaining twitter API calls for the executed command.
+ * CLIDriver contains all of the command line logic e.g. identifying the
+ * command, executing and returning its result. it also shows the
+ * rateLimitStatus e.g. the remaining twitter API calls for the executed
+ * command.
  * 
  * @author org.projectspinoza
  * @version v1.0
- *
+ * 
  */
 public class CLIDriver {
     private static Logger log = LogManager.getRootLogger();
@@ -79,8 +80,10 @@ public class CLIDriver {
 
     private Object result = null;
     int remApiLimits = 0;
+
     /**
-     * executes any of the available tsakCommand (provided in the argument) and returns its result in java's Object format.
+     * executes any of the available tsakCommand (provided in the argument) and
+     * returns its result in java's Object format.
      * 
      * @param twitter
      * @param parsedCommand
@@ -176,6 +179,7 @@ public class CLIDriver {
         showRateLimitStatus();
         return result;
     }
+
     /**
      * executes command dumpAccountSettings and returns its result.
      * 
@@ -190,6 +194,7 @@ public class CLIDriver {
         outputFile = dumpAccountSettings.getOutputFile();
         return twitter.getAccountSettings();
     }
+
     /**
      * executes command dumpFollowersList and returns its result.
      * 
@@ -206,18 +211,21 @@ public class CLIDriver {
         long cursor = -1;
         List<PagableResponseList<User>> followersListCollection = new ArrayList<PagableResponseList<User>>();
         do {
-            PagableResponseList<User> pagableUser = dumpFollowersList.getScreenName() == null ? twitter
-                    .getFollowersList(dumpFollowersList.getUserId(), cursor)
-                    : twitter.getFollowersList(dumpFollowersList.getScreenName(),
-                            cursor);
+            PagableResponseList<User> pagableUser = dumpFollowersList
+                    .getScreenName() == null ? twitter.getFollowersList(
+                    dumpFollowersList.getUserId(), cursor)
+                    : twitter.getFollowersList(
+                            dumpFollowersList.getScreenName(), cursor);
             followersListCollection.add(pagableUser);
             cursor = pagableUser.getNextCursor();
             remApiLimits = pagableUser.getRateLimitStatus().getRemaining();
         } while ((cursor != 0) && (remApiLimits != 0) && (--userLimit > 0));
         return followersListCollection;
     }
+
     /**
      * executes command dumpFriendsList and returns its result.
+     * 
      * @param twitter
      * @param subCommand
      * @return friendsList
@@ -231,8 +239,9 @@ public class CLIDriver {
         long cursor = -1;
         List<PagableResponseList<User>> friendListCollection = new ArrayList<PagableResponseList<User>>();
         do {
-            PagableResponseList<User> pagableUser = dumpFriendList.getScreenName() == null ? twitter
-                    .getFriendsList(dumpFriendList.getUserId(), cursor) : twitter
+            PagableResponseList<User> pagableUser = dumpFriendList
+                    .getScreenName() == null ? twitter.getFriendsList(
+                    dumpFriendList.getUserId(), cursor) : twitter
                     .getFriendsList(dumpFriendList.getScreenName(), cursor);
             friendListCollection.add(pagableUser);
             cursor = pagableUser.getNextCursor();
@@ -240,6 +249,7 @@ public class CLIDriver {
         } while ((cursor != 0) && (remApiLimits != 0) && (--userLimit > 0));
         return friendListCollection;
     }
+
     /**
      * executes command dumpFollowersIDs and returns its result.
      * 
@@ -266,6 +276,7 @@ public class CLIDriver {
         } while ((cursor != 0) && (remApiLimits != 0) && (--userLimit > 0));
         return followerIDsCollection;
     }
+
     /**
      * executes command dumpFriendsIDs and returns its result.
      * 
@@ -292,6 +303,7 @@ public class CLIDriver {
         } while ((cursor != 0) && (remApiLimits != 0) && (--userLimit > 0));
         return friendIDsCollection;
     }
+
     /**
      * executes command dumpUserTimeLine and returns its result.
      * 
@@ -310,8 +322,9 @@ public class CLIDriver {
         Paging page = new Paging(pagecounter, 200);
         do {
             ResponseList<Status> statuses = dumpUserTimeLine.getScreenName() == null ? twitter
-                    .getUserTimeline(dumpUserTimeLine.getUserId(), page) : twitter
-                    .getUserTimeline(dumpUserTimeLine.getScreenName(), page);
+                    .getUserTimeline(dumpUserTimeLine.getUserId(), page)
+                    : twitter.getUserTimeline(dumpUserTimeLine.getScreenName(),
+                            page);
             userTimelineCollection.add(statuses);
             pagecounter++;
             page.setPage(pagecounter);
@@ -319,6 +332,7 @@ public class CLIDriver {
         } while ((remApiLimits != 0) && --userLimit > 0);
         return userTimelineCollection;
     }
+
     /**
      * executes command dumpHomeTimeLine and returns its result.
      * 
@@ -333,6 +347,7 @@ public class CLIDriver {
         outputFile = dumpHomeTimeLine.getOutputFile();
         return twitter.getHomeTimeline();
     }
+
     /**
      * executes command dumpTweets and returns its result.
      * 
@@ -357,6 +372,7 @@ public class CLIDriver {
         outputFile = dumpTweets.getOutputFile();
         return tweetsCollection;
     }
+
     /**
      * executes command dumpOwnRetweets and returns its result.
      * 
@@ -371,6 +387,7 @@ public class CLIDriver {
         outputFile = dumpOwnRetweets.getOutputFile();
         return twitter.getRetweetsOfMe();
     }
+
     /**
      * executes command dumpStatus and returns its result.
      * 
@@ -385,6 +402,7 @@ public class CLIDriver {
         outputFile = dumpStatus.getOutputFile();
         return twitter.showStatus(dumpStatus.getStatusId());
     }
+
     /**
      * executes command dumpRetweets and returns its result.
      * 
@@ -399,6 +417,7 @@ public class CLIDriver {
         outputFile = dumpRetweeters.getOutputFile();
         return twitter.getRetweeterIds(dumpRetweeters.getStatusId(), -1);
     }
+
     /**
      * executes command dumpMentionsTimeLine and returns its result.
      * 
@@ -413,6 +432,7 @@ public class CLIDriver {
         outputFile = dumpMentionsTimeLine.getOutputFile();
         return twitter.getMentionsTimeline();
     }
+
     /**
      * executes command dumpUsersLookup and returns its result.
      * 
@@ -426,7 +446,8 @@ public class CLIDriver {
             throws IOException, TwitterException {
         CommandDumpUsersLookup dumpUsersLookup = (CommandDumpUsersLookup) subCommand;
         outputFile = dumpUsersLookup.getOutputFile();
-        BufferedReader bReader = new BufferedReader(new FileReader(new File(dumpUsersLookup.getInputFile())));
+        BufferedReader bReader = new BufferedReader(new FileReader(new File(
+                dumpUsersLookup.getInputFile())));
         String line;
         List<String> screenNames = new ArrayList<String>();
         List<Long> ids = new ArrayList<Long>();
@@ -458,6 +479,7 @@ public class CLIDriver {
         }
         return friendListCollection;
     }
+
     /**
      * executes command dumpBlockList and returns its result.
      * 
@@ -472,6 +494,7 @@ public class CLIDriver {
         outputFile = dumpBlockList.getOutputFile();
         return twitter.getBlocksList();
     }
+
     /**
      * executes command searchUsers and returns its result.
      * 
@@ -487,13 +510,14 @@ public class CLIDriver {
         int page = 1;
         List<ResponseList<User>> usersCollection = new ArrayList<ResponseList<User>>();
         do {
-            ResponseList<User> user = twitter.searchUsers(searchUsers.getKeywords(),
-                    page++);
+            ResponseList<User> user = twitter.searchUsers(
+                    searchUsers.getKeywords(), page++);
             usersCollection.add(user);
             remApiLimits = user.getRateLimitStatus().getRemaining();
         } while ((remApiLimits != 0) && (page < 50));
         return usersCollection;
     }
+
     /**
      * executes command dumpShowFriends and returns its result.
      * 
@@ -507,7 +531,8 @@ public class CLIDriver {
             throws NumberFormatException, TwitterException {
         CommandShowFriendShip showFriendShip = (CommandShowFriendShip) subCommand;
         outputFile = showFriendShip.getOutputFile();
-        if (isLong(showFriendShip.getSource()) && isLong(showFriendShip.getTarget())) {
+        if (isLong(showFriendShip.getSource())
+                && isLong(showFriendShip.getTarget())) {
             return twitter.showFriendship(
                     Long.parseLong(showFriendShip.getSource()),
                     Long.parseLong(showFriendShip.getTarget()));
@@ -516,6 +541,7 @@ public class CLIDriver {
                     showFriendShip.getTarget());
         }
     }
+
     /**
      * executes command dumpFavourites and returns its result.
      * 
@@ -530,6 +556,7 @@ public class CLIDriver {
         outputFile = dumpFavourites.getOutputFile();
         return twitter.getFavorites();
     }
+
     /**
      * executes command dumpSugestedUserCats and returns its result.
      * 
@@ -544,6 +571,7 @@ public class CLIDriver {
         outputFile = dumpSugeestedUserCats.getOutputFile();
         return twitter.getSuggestedUserCategories();
     }
+
     /**
      * executes command dumpUserSuggestions and returns its result.
      * 
@@ -558,6 +586,7 @@ public class CLIDriver {
         outputFile = dumpUserSuggestions.getOutputFile();
         return twitter.getUserSuggestions(dumpUserSuggestions.getSlug());
     }
+
     /**
      * executes command dumpMemberSuggestions and returns its result.
      * 
@@ -572,6 +601,7 @@ public class CLIDriver {
         outputFile = dumpMemberSuggestions.getOutputFile();
         return twitter.getMemberSuggestions(dumpMemberSuggestions.getSlug());
     }
+
     /**
      * executes command dumpUserLists and returns its result.
      * 
@@ -588,6 +618,7 @@ public class CLIDriver {
                 .getUserLists(dumpUserLists.getUserId()) : twitter
                 .getUserLists(dumpUserLists.getScreenName());
     }
+
     /**
      * executes command dumpListStatuses and returns its result.
      * 
@@ -609,6 +640,7 @@ public class CLIDriver {
         } while (page.getPage() < 180);
         return listStatusesCollection;
     }
+
     /**
      * executes command dumpSavedSearches and returns its result.
      * 
@@ -623,6 +655,7 @@ public class CLIDriver {
         outputFile = dumpSavedSearches.getOutputFile();
         return twitter.getSavedSearches();
     }
+
     /**
      * executes command dumpLookupFriendShip and returns its result.
      * 
@@ -669,6 +702,7 @@ public class CLIDriver {
         }
         return friendShipCollection;
     }
+
     /**
      * executes command dumpIncomingFriendships and returns its result.
      * 
@@ -692,6 +726,7 @@ public class CLIDriver {
         } while ((cursor != 0) && (remApiLimits < 0) && (--userLimit > 0));
         return IncomingFriendshipsCollection;
     }
+
     /**
      * executes command dumpOutgoingFriendships and returns its result.
      * 
@@ -715,6 +750,7 @@ public class CLIDriver {
         } while ((cursor != 0) && (remApiLimits < 0) && (--userLimit > 0));
         return OutgoingFriendshipsCollection;
     }
+
     /**
      * executes command dumpGeoDetails and returns its result.
      * 
@@ -729,6 +765,7 @@ public class CLIDriver {
         outputFile = dumpGeoDetails.getOutputFile();
         return twitter.getGeoDetails(dumpGeoDetails.getPlaceId());
     }
+
     /**
      * executes command dumpSimilarPlaces and returns its result.
      * 
@@ -741,10 +778,12 @@ public class CLIDriver {
             throws TwitterException {
         CommandDumpSimilarPlaces dumpSimilarPlaces = (CommandDumpSimilarPlaces) subCommand;
         outputFile = dumpSimilarPlaces.getOutputFile();
-        return twitter.getSimilarPlaces(new GeoLocation(
-                dumpSimilarPlaces.getLatitude(), dumpSimilarPlaces.getLongitude()),
-                dumpSimilarPlaces.getPlaceName(), null, null);
+        return twitter.getSimilarPlaces(
+                new GeoLocation(dumpSimilarPlaces.getLatitude(),
+                        dumpSimilarPlaces.getLongitude()), dumpSimilarPlaces
+                        .getPlaceName(), null, null);
     }
+
     /**
      * executes command dumpSearchPlaces and returns its result.
      * 
@@ -757,9 +796,10 @@ public class CLIDriver {
             throws TwitterException {
         CommandSearchPlace searchPlace = (CommandSearchPlace) subCommand;
         outputFile = searchPlace.getOutputFile();
-        return twitter.searchPlaces(new GeoQuery(new GeoLocation(
-                searchPlace.getLatitude(), searchPlace.getLongitude())));
+        return twitter.searchPlaces(new GeoQuery(new GeoLocation(searchPlace
+                .getLatitude(), searchPlace.getLongitude())));
     }
+
     /**
      * executes command dumpAvailableTrends and returns its result.
      * 
@@ -774,6 +814,7 @@ public class CLIDriver {
         outputFile = dumpAvailableTrends.getOutputFile();
         return twitter.getAvailableTrends();
     }
+
     /**
      * executes command dumpPlaceTrends and returns its result.
      * 
@@ -788,6 +829,7 @@ public class CLIDriver {
         outputFile = dumpPlaceTrends.getOutputFile();
         return twitter.getPlaceTrends(dumpPlaceTrends.getWoeId());
     }
+
     /**
      * executes command dumpClosesTrends and returns its result.
      * 
@@ -800,9 +842,10 @@ public class CLIDriver {
             throws TwitterException {
         CommandDumpClosestTrends dumpClosestTrends = (CommandDumpClosestTrends) subCommand;
         outputFile = dumpClosestTrends.getOutputFile();
-        return twitter.getClosestTrends(new GeoLocation(
-                dumpClosestTrends.getLatitude(), dumpClosestTrends.getLongitude()));
+        return twitter.getClosestTrends(new GeoLocation(dumpClosestTrends
+                .getLatitude(), dumpClosestTrends.getLongitude()));
     }
+
     /**
      * executes command dumpMutesIDs and returns its result.
      * 
@@ -827,6 +870,7 @@ public class CLIDriver {
         } while ((cursor != 0) && (remApiLimits < 0) && (--userLimit > 0));
         return MutesIDsCollection;
     }
+
     /**
      * executes command dumpMutesLists and returns its result.
      * 
@@ -850,6 +894,7 @@ public class CLIDriver {
         } while ((cursor != 0) && (remApiLimits != 0) && (--userLimit > 0));
         return MutesListCollection;
     }
+
     /**
      * executes command dumpUserListMemberships and returns its result.
      * 
@@ -866,16 +911,18 @@ public class CLIDriver {
         long cursor = -1;
         List<PagableResponseList<UserList>> ListMembershipsCollection = new ArrayList<PagableResponseList<UserList>>();
         do {
-            PagableResponseList<UserList> userList = dumpUserListMemberships.getScreenName() == null ? twitter
-                    .getUserListMemberships(dumpUserListMemberships.getUserId(),
-                            cursor) : twitter.getUserListMemberships(
-                    dumpUserListMemberships.getScreenName(), cursor);
+            PagableResponseList<UserList> userList = dumpUserListMemberships
+                    .getScreenName() == null ? twitter.getUserListMemberships(
+                    dumpUserListMemberships.getUserId(), cursor) : twitter
+                    .getUserListMemberships(
+                            dumpUserListMemberships.getScreenName(), cursor);
             ListMembershipsCollection.add(userList);
             cursor = userList.getNextCursor();
             remApiLimits = userList.getRateLimitStatus().getRemaining();
         } while ((cursor != 0) && (remApiLimits != 0) && (--userLimit > 0));
         return ListMembershipsCollection;
     }
+
     /**
      * executes command dumpUserListSubscribers and returns its result.
      * 
@@ -900,6 +947,7 @@ public class CLIDriver {
         } while ((cursor != 0) && (remApiLimits != 0) && (--userLimit > 0));
         return ListSubscribersCollection;
     }
+
     /**
      * executes command dumpUserListMembers and returns its result.
      * 
@@ -924,6 +972,7 @@ public class CLIDriver {
         } while ((cursor != 0) && (remApiLimits != 0) && (--userLimit > 0));
         return ListMembersCollection;
     }
+
     /**
      * executes command dumpUserListSubscriptions and returns its result.
      * 
@@ -962,8 +1011,10 @@ public class CLIDriver {
     public String getOutputFile() {
         return outputFile;
     }
+
     /**
-     * prints rateLimitStatus. e.g. the remaining twitter API calls for executed command
+     * prints rateLimitStatus. e.g. the remaining twitter API calls for executed
+     * command
      * 
      */
     public void showRateLimitStatus() {
