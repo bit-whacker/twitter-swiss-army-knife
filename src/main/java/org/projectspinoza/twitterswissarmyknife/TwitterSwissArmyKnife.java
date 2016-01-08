@@ -18,13 +18,13 @@ import org.projectspinoza.twitterswissarmyknife.streaming.TwitterStreamingExcecu
 import org.projectspinoza.twitterswissarmyknife.util.TsakResponse;
 import org.reflections.Reflections;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
-
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
 
 /**
  * TwitterSwissArmyKnife
@@ -85,7 +85,7 @@ public class TwitterSwissArmyKnife {
      */
     public TwitterSwissArmyKnife setTsakCommand(TsakCommand tsakCommands) {
         log.info("setting tsakCommand");
-        tsakInstance.tsakCommand = tsakCommands;
+        tsakCommand = tsakCommands;
         return tsakInstance;
     }
     
@@ -110,6 +110,7 @@ public class TwitterSwissArmyKnife {
      * @return tsakInstance
      */
     public TwitterSwissArmyKnife write(){
+    	if(tsakResponse == null){return tsakInstance;}
     	BufferedWriter bufferedWriter = null;
     	try{
     		BaseCommand baseCommand = getSubCommand(subCommander.getParsedCommand());	
@@ -121,6 +122,14 @@ public class TwitterSwissArmyKnife {
     		log.debug(ioex.getMessage());
     	}catch(NullPointerException npex){
     		log.debug(npex.getMessage());
+    	}finally{
+    		if(bufferedWriter != null){
+    			try{
+    				bufferedWriter.close();
+    			}catch(IOException ioex){
+    				log.error("cannot close writer!!! {}", ioex.getMessage());
+    			}
+    		}
     	}
         return tsakInstance;
     }
@@ -164,10 +173,10 @@ public class TwitterSwissArmyKnife {
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    public TwitterSwissArmyKnife executeCommand(String[] args)
-            throws TwitterException, ParameterException, IOException, InstantiationException, IllegalAccessException {
+    public TwitterSwissArmyKnife executeCommand(String[] args) throws TwitterException, ParameterException, IOException, InstantiationException, IllegalAccessException {
+    	tsakResponse = null;
         if (args == null) {
-        	log.debug("Need help?? run > tsak <commandName> --help");
+        	log.info("Need help?? run > tsak <commandName> --help");
             return tsakInstance;
         }
         JCommander rootCommander = new JCommander();
