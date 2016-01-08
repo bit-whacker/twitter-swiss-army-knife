@@ -6,6 +6,7 @@ import twitter4j.StallWarning;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
 import twitter4j.StatusListener;
+
 /**
  * TwitterStatusStreams
  * 
@@ -18,8 +19,7 @@ public class TwitterStatusStreams implements StatusListener {
     private boolean storeStreamingData;
     private TsakResponseWriter writer;
 
-    public TwitterStatusStreams(String keywordsArray[],
-            boolean storeStreamData, TsakResponseWriter writer) {
+    public TwitterStatusStreams(String keywordsArray[], boolean storeStreamData, TsakResponseWriter writer) {
         this.setStoreStreamingData(storeStreamData);
         this.writer = writer;
     }
@@ -44,11 +44,9 @@ public class TwitterStatusStreams implements StatusListener {
     public void onStatus(Status status) {
         if (storeStreamingData) {
             writer.write(status, "streamStatuses", null);
-            System.out.println("Writble@" + status.getUser().getScreenName()
-                    + " - " + status.getText());
+            System.out.println("Writble@" + status.getUser().getScreenName() + " - " + status.getText());
         } else {
-            System.out.println("@" + status.getUser().getScreenName() + " - "
-                    + status.getText());
+            System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
         }
     }
 

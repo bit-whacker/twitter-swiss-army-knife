@@ -14,8 +14,8 @@ import twitter4j.TwitterStreamFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
 /**
- * TwitterStreamingExcecutor
- * contains logic for handling and executing twitter streaming API commands.
+ * TwitterStreamingExcecutor contains logic for handling and executing twitter
+ * streaming API commands.
  * 
  * @author org.projectspinoza
  * @version v1.0
@@ -24,6 +24,7 @@ import twitter4j.conf.ConfigurationBuilder;
 public class TwitterStreamingExcecutor {
     private static Logger log = LogManager.getRootLogger();
     private TwitterStream twitterStream;
+
     /**
      * executes twitter streaming command.
      * 
@@ -31,11 +32,9 @@ public class TwitterStreamingExcecutor {
      * @param streamStatuses
      * @throws IOException
      */
-    public void execute(ConfigurationBuilder configurationBuilder,
-            CommandStreamStatuses streamStatuses) throws IOException {
+    public void execute(ConfigurationBuilder configurationBuilder, CommandStreamStatuses streamStatuses) throws IOException {
 
-        TsakResponseWriter responseWriter = new TsakResponseWriter(
-                streamStatuses.getOutputFile());
+        TsakResponseWriter responseWriter = new TsakResponseWriter(streamStatuses.getOutputFile());
         streamedStatuses(configurationBuilder, streamStatuses, responseWriter);
         final ConsoleReader reader = new ConsoleReader();
         while (true) {
@@ -46,6 +45,7 @@ public class TwitterStreamingExcecutor {
             }
         }
     }
+
     /**
      * dump twitter streaming statuses.
      * 
@@ -53,27 +53,18 @@ public class TwitterStreamingExcecutor {
      * @param streamStatuses
      * @param responseWriter
      */
-    private void streamedStatuses(ConfigurationBuilder configurationBuilder,
-            CommandStreamStatuses streamStatuses,
-            TsakResponseWriter responseWriter) {
-
+    private void streamedStatuses(ConfigurationBuilder configurationBuilder, CommandStreamStatuses streamStatuses, TsakResponseWriter responseWriter) {
         String keywords = streamStatuses.getKeywords();
         String keywordsArray[] = keywords.split(",");
-        if (streamStatuses.getStoreStreamingStatus().equals("true")
-                || streamStatuses.getStoreStreamingStatus().equals("false")) {
-            twitterStream = new TwitterStreamFactory(
-                    configurationBuilder.build()).getInstance();
-            TwitterStatusStreams statusStreams = new TwitterStatusStreams(
-                    keywordsArray,
-                    Boolean.parseBoolean(streamStatuses.getStoreStreamingStatus()),
-                    responseWriter);
+        if (streamStatuses.getStoreStreamingStatus().equals("true") || streamStatuses.getStoreStreamingStatus().equals("false")) {
+            twitterStream = new TwitterStreamFactory(configurationBuilder.build()).getInstance();
+            TwitterStatusStreams statusStreams = new TwitterStatusStreams(keywordsArray, Boolean.parseBoolean(streamStatuses.getStoreStreamingStatus()), responseWriter);
             FilterQuery filterQuery = new FilterQuery();
             filterQuery.track(keywordsArray);
             twitterStream.addListener(statusStreams);
             twitterStream.filter(filterQuery);
         } else {
-            log.error("Error command argument. -store expects true|false found "
-                    + streamStatuses.getStoreStreamingStatus());
+            log.error("Error command argument. -store expects true|false found {}", streamStatuses.getStoreStreamingStatus());
         }
     }
 }

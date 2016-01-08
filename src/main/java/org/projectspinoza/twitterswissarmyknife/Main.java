@@ -39,7 +39,8 @@ public class Main {
         /**
          * TSAK USAGE
          * 
-         * 1. USAGE (NORMAL|SIMPLE) =======================================
+         * 1. USAGE (NORMAL|SIMPLE) 
+         * =======================================
          * TwitterSwissArmyKnife tsak = TwitterSwissArmyKnife.getInstance();
          * tsak.executeCommand(args).write();
          */
@@ -47,7 +48,8 @@ public class Main {
         /**
          * TSAK USAGE
          * 
-         * 2. Using TSAK as a shell ===================================
+         * 2. Using TSAK as a shell
+         * ===================================
          * 
          */
         consoleReader = new ConsoleReader();
@@ -75,15 +77,14 @@ public class Main {
          * multiple commands in a loop?)
          * ===================================================================
          * 
-         * String[] followersCommand = {"tsak","dumpFollowerIDs","-uname",
-         * "dmkavanagh", "-o", "followersIds.txt"}; String[] userListsCommand =
-         * {"tsak", "dumpUserLists", "-uname", "dmkavanagh", "-o",
-         * "userLists.txt"}; String[] userSuggestionsCommand = {"tsak",
-         * "dumpUserSuggestions", "-slug", "Sports", "-o",
-         * "userSuggestions.txt"};
+         * String[] followersCommand = {"tsak","dumpFollowerIDs","-uname", "dmkavanagh", "-o", "followersIds.txt"}; 
+         * String[] userListsCommand = {"tsak", "dumpUserLists", "-uname", "dmkavanagh", "-o", "userLists.txt"}; 
+         * String[] userSuggestionsCommand = {"tsak", "dumpUserSuggestions", "-slug", "Sports", "-o", "userSuggestions.txt"};
          * 
          * List<String[]> commands = new ArrayList<String[]>();
-         * commands.add(followersCommand); commands.add(userListsCommand);
+         * 
+         * commands.add(followersCommand); 
+         * commands.add(userListsCommand);
          * commands.add(userSuggestionsCommand);
          * 
          * TwitterSwissArmyKnife tsak = TwitterSwissArmyKnife.getInstance();
@@ -93,23 +94,24 @@ public class Main {
          */
 
         /**
-         * 4: USAGE (Do you want to get/analyze the original response from
-         * twitter API ?)
-         * ========================================================
-         * =====================
+         * 4: USAGE (Do you want to get/analyze the original response from twitter API ?)
+         * ==============================================================================
          * 
          * TwitterSwissArmyKnife tsak = TwitterSwissArmyKnife.getInstance();
          * 
-         * i. get the result only ------------------- TsakResponse result =
-         * tsak.executeCommand(args).getResult();
+         * i. get the result only 
+         * -------------------------------- 
+         * TsakResponse result = tsak.executeCommand(args).getResult();
          * 
-         * ii. write and then get the result ---------------------------------
+         * ii. write and then get the result
+         * --------------------------------
          * TsakResponse result = tsak.executeCommand(args).write().getResult();
          * 
          */
 
         /**
-         * 5: USAGE (much more) ====================
+         * 5: USAGE (much more) 
+         * ====================
          * 
          * for more detailed usage study the API. (TwitterSwissArmyKnife)
          * 
