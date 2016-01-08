@@ -1,6 +1,6 @@
 package org.projectspinoza.twitterswissarmyknife.command;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,13 +70,13 @@ public class CommandDumpFollowersList extends BaseCommand {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-        List<PagableResponseList<User>> followersList = (List<PagableResponseList<User>>) tsakResponse
-                .getResponseData();
+    public void write(TsakResponse tsakResponse, BufferedWriter writer) throws IOException {
+        List<PagableResponseList<User>> followersList = (List<PagableResponseList<User>>) tsakResponse.getResponseData();
         for (PagableResponseList<User> users : followersList) {
             for (User user : users) {
                 String userJson = new Gson().toJson(user);
                 writer.append(userJson);
+                writer.newLine();
             }
         }
     }

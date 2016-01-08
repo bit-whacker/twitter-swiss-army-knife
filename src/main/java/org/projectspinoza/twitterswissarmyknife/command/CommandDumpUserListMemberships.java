@@ -1,6 +1,6 @@
 package org.projectspinoza.twitterswissarmyknife.command;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +60,7 @@ public class CommandDumpUserListMemberships extends BaseCommand {
             PagableResponseList<UserList> userLists = this.screenName == null ? twitter
                     .getUserListMemberships(this.userId, cursor) : twitter
                     .getUserListMemberships(this.screenName, cursor);
-                    listMemberships.add(userLists);
+            listMemberships.add(userLists);
             cursor = userLists.getNextCursor();
             remApiLimits = userLists.getRateLimitStatus().getRemaining();
         } while ((cursor != 0) && (remApiLimits != 0) && (--userLimit > 0));
@@ -71,12 +71,13 @@ public class CommandDumpUserListMemberships extends BaseCommand {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
+    public void write(TsakResponse tsakResponse, BufferedWriter writer) throws IOException {
         List<PagableResponseList<UserList>> userLists = (List<PagableResponseList<UserList>>) tsakResponse.getResponseData();
         for (PagableResponseList<UserList> userslist : userLists) {
             for (UserList list : userslist) {
                 String listJson = new Gson().toJson(list);
                 writer.append(listJson);
+                writer.newLine();
             }
         }
     }

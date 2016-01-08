@@ -1,6 +1,6 @@
 package org.projectspinoza.twitterswissarmyknife.command;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,27 +22,31 @@ public class CommandDumpUserListSubscribers extends BaseCommand {
     private long listId;
     @Parameter(names = "-limit", description = "Authenticated user api calls limit")
     private int limit = 1;
-	public long getListId() {
-		return listId;
-	}
-	public void setListId(long listId) {
-		this.listId = listId;
-	}
-	public int getLimit() {
-		return limit;
-	}
-	public void setLimit(int limit) {
-		this.limit = limit;
-	}
-	@Override
-	public TsakResponse execute(Twitter twitter) throws TwitterException {
-	    List<PagableResponseList<User>> listSubscribers = new ArrayList<PagableResponseList<User>>();
-	    int userLimit = this.limit;
-	    int remApiLimits = 0;
+
+    public long getListId() {
+        return listId;
+    }
+
+    public void setListId(long listId) {
+        this.listId = listId;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
+    @Override
+    public TsakResponse execute(Twitter twitter) throws TwitterException {
+        List<PagableResponseList<User>> listSubscribers = new ArrayList<PagableResponseList<User>>();
+        int userLimit = this.limit;
+        int remApiLimits = 0;
         long cursor = -1;
         do {
-            PagableResponseList<User> subscribers = twitter.getUserListSubscribers(
-                    this.listId, cursor);
+            PagableResponseList<User> subscribers = twitter.getUserListSubscribers(this.listId, cursor);
             listSubscribers.add(subscribers);
             cursor = subscribers.getNextCursor();
             remApiLimits = subscribers.getRateLimitStatus().getRemaining();
@@ -50,20 +54,20 @@ public class CommandDumpUserListSubscribers extends BaseCommand {
         TsakResponse tsakResponse = new TsakResponse(remApiLimits, listSubscribers);
         tsakResponse.setCommandDetails(this.toString());
         return tsakResponse;
-	}
-	
-	@SuppressWarnings("unchecked")
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
-	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-	    List<PagableResponseList<User>> subscribers = (List<PagableResponseList<User>>) tsakResponse.getResponseData();
+    public void write(TsakResponse tsakResponse, BufferedWriter writer) throws IOException {
+        List<PagableResponseList<User>> subscribers = (List<PagableResponseList<User>>) tsakResponse.getResponseData();
         for (PagableResponseList<User> users : subscribers) {
             for (User user : users) {
                 String userJson = new Gson().toJson(user);
                 writer.append(userJson);
             }
         }
-	}
-	
+    }
+
     @Override
     public String toString() {
         return "CommandDumpUserListSubscribers [listId=" + listId + ", limit="

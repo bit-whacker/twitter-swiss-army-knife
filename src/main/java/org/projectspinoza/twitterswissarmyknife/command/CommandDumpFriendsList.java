@@ -1,20 +1,20 @@
 package org.projectspinoza.twitterswissarmyknife.command;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.projectspinoza.twitterswissarmyknife.util.TsakResponse;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-import com.google.gson.Gson;
-
 import twitter4j.PagableResponseList;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.User;
+
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
+import com.google.gson.Gson;
 
 @Parameters(commandNames = "dumpFriendsList", commandDescription = "Friends list")
 public class CommandDumpFriendsList extends BaseCommand {
@@ -24,34 +24,41 @@ public class CommandDumpFriendsList extends BaseCommand {
     private long userId;
     @Parameter(names = "-limit", description = "Authenticated user api calls limit")
     private int limit = 1;
-	public String getScreenName() {
-		return screenName;
-	}
-	public void setScreenName(String screenName) {
-		this.screenName = screenName;
-	}
-	public long getUserId() {
-		return userId;
-	}
-	public void setUserId(long userid) {
-		this.userId = userid;
-	}
-	public int getLimit() {
-		return limit;
-	}
-	public void setLimit(int limit) {
-		this.limit = limit;
-	}
-	
-	@Override
-	public TsakResponse execute(Twitter twitter) throws TwitterException {
-	    List<PagableResponseList<User>> friendsList = new ArrayList<PagableResponseList<User>>();
+
+    public String getScreenName() {
+        return screenName;
+    }
+
+    public void setScreenName(String screenName) {
+        this.screenName = screenName;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userid) {
+        this.userId = userid;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
+    @Override
+    public TsakResponse execute(Twitter twitter) throws TwitterException {
+        List<PagableResponseList<User>> friendsList = new ArrayList<PagableResponseList<User>>();
         int userLimit = this.getLimit();
         int remApiLimits = 0;
         long cursor = -1;
         do {
-            PagableResponseList<User> users = this.screenName != null ? twitter.getFriendsList(
-                        this.screenName, cursor) : twitter.getFriendsList(this.userId, cursor);
+            PagableResponseList<User> users = this.screenName != null ? twitter
+                    .getFriendsList(this.screenName, cursor) : twitter
+                    .getFriendsList(this.userId, cursor);
             friendsList.add(users);
             cursor = users.getNextCursor();
             remApiLimits = users.getRateLimitStatus().getRemaining();
@@ -59,20 +66,21 @@ public class CommandDumpFriendsList extends BaseCommand {
         TsakResponse tsakResponse = new TsakResponse(remApiLimits, friendsList);
         tsakResponse.setCommandDetails(this.toString());
         return tsakResponse;
-	}
-	
-	@SuppressWarnings("unchecked")
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
-	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-	    List<PagableResponseList<User>> friendsList = (List<PagableResponseList<User>>) tsakResponse.getResponseData();
+    public void write(TsakResponse tsakResponse, BufferedWriter writer) throws IOException {
+        List<PagableResponseList<User>> friendsList = (List<PagableResponseList<User>>) tsakResponse.getResponseData();
         for (PagableResponseList<User> users : friendsList) {
             for (User user : users) {
                 String userJson = new Gson().toJson(user);
                 writer.append(userJson);
+                writer.newLine();
             }
         }
-	}
-	
+    }
+
     @Override
     public String toString() {
         return "CommandDumpFriendsList [screenName=" + screenName + ", userId="

@@ -1,6 +1,6 @@
 package org.projectspinoza.twitterswissarmyknife.command;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.projectspinoza.twitterswissarmyknife.util.TsakResponse;
@@ -21,38 +21,44 @@ public class CommandDumpClosestTrends extends BaseCommand {
     private Double latitude;
     @Parameter(names = "-long", description = "longitude", required = true)
     private Double longitude;
-	
+
     public Double getLatitude() {
-		return latitude;
-	}
-	public void setLatitude(Double latitude) {
-		this.latitude = latitude;
-	}
-	public Double getLongitude() {
-		return longitude;
-	}
-	public void setLongitude(Double longitude) {
-		this.longitude = longitude;
-	}
-	@Override
-	public TsakResponse execute(Twitter twitter) throws TwitterException {
-		ResponseList<Location> closestTrends = twitter.getClosestTrends(
-		        new GeoLocation(this.latitude, this.longitude));
-		int remApiLimits = closestTrends.getRateLimitStatus().getRemaining();
-		TsakResponse tsakResponse = new TsakResponse(remApiLimits, closestTrends);
-		tsakResponse.setCommandDetails(this.toString());
-		return tsakResponse;
-	}
-	
-	@SuppressWarnings("unchecked")
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
     @Override
-	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-	    ResponseList<Location> locations = (ResponseList<Location>) tsakResponse.getResponseData();
+    public TsakResponse execute(Twitter twitter) throws TwitterException {
+        ResponseList<Location> closestTrends = twitter
+                .getClosestTrends(new GeoLocation(this.latitude, this.longitude));
+        int remApiLimits = closestTrends.getRateLimitStatus().getRemaining();
+        TsakResponse tsakResponse = new TsakResponse(remApiLimits, closestTrends);
+        tsakResponse.setCommandDetails(this.toString());
+        return tsakResponse;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void write(TsakResponse tsakResponse, BufferedWriter writer) throws IOException {
+        ResponseList<Location> locations = (ResponseList<Location>) tsakResponse.getResponseData();
         for (Location location : locations) {
             String jsonLocation = new Gson().toJson(location);
             writer.append(jsonLocation);
+            writer.newLine();
         }
-	}
+    }
+
     @Override
     public String toString() {
         return "CommandDumpClosestTrends [latitude=" + latitude

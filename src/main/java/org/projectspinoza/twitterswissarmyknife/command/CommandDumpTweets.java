@@ -1,6 +1,6 @@
 package org.projectspinoza.twitterswissarmyknife.command;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,23 +23,28 @@ public class CommandDumpTweets extends BaseCommand {
     private String keywords;
     @Parameter(names = "-limit", description = "Authenticated user api calls limit")
     private int limit = 1;
-	public String getKeywords() {
-		return keywords;
-	}
-	public void setKeywords(String keywords) {
-		this.keywords = keywords;
-	}
-	public int getLimit() {
-		return limit;
-	}
-	public void setLimit(int limit) {
-		this.limit = limit;
-	}
-	@Override
-	public TsakResponse execute(Twitter twitter) throws TwitterException {
-	    List<List<Status>> tweetsCollection = new ArrayList<List<Status>>();
-	    int userLimit = this.limit;
-	    int remApiLimits = 1;
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
+    @Override
+    public TsakResponse execute(Twitter twitter) throws TwitterException {
+        List<List<Status>> tweetsCollection = new ArrayList<List<Status>>();
+        int userLimit = this.limit;
+        int remApiLimits = 1;
         Query query = new Query(this.keywords);
         QueryResult queryResult;
         do {
@@ -51,20 +56,21 @@ public class CommandDumpTweets extends BaseCommand {
         TsakResponse tsakResponse = new TsakResponse(remApiLimits, tweetsCollection);
         tsakResponse.setCommandDetails(this.toString());
         return tsakResponse;
-	}
-	
-	@SuppressWarnings("unchecked")
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
-	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-	    List<List<Status>> tweetsCollection = (List<List<Status>>) tsakResponse.getResponseData();
-	    for (List<Status> statuses : tweetsCollection) {
+    public void write(TsakResponse tsakResponse, BufferedWriter writer) throws IOException {
+        List<List<Status>> tweetsCollection = (List<List<Status>>) tsakResponse.getResponseData();
+        for (List<Status> statuses : tweetsCollection) {
             for (Status status : statuses) {
                 String statusJson = new Gson().toJson(status);
                 writer.append(statusJson);
+                writer.newLine();
             }
         }
-	}
-	
+    }
+
     @Override
     public String toString() {
         return "CommandDumpTweets [keywords=" + keywords + ", limit=" + limit

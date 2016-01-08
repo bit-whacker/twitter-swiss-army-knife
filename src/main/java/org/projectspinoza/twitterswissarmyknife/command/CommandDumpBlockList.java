@@ -1,6 +1,6 @@
 package org.projectspinoza.twitterswissarmyknife.command;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.projectspinoza.twitterswissarmyknife.util.TsakResponse;
@@ -16,27 +16,28 @@ import com.google.gson.Gson;
 @Parameters(commandNames = "dumpBlockList", commandDescription = "Authenticated user's blocked list")
 public class CommandDumpBlockList extends BaseCommand {
 
-	@Override
-	public TsakResponse execute(Twitter twitter) throws TwitterException {
-		PagableResponseList<User> blockList = twitter.getBlocksList();
-		int remApiLimits = blockList.getRateLimitStatus().getRemaining();
-		TsakResponse tsakResponse = new TsakResponse(remApiLimits, blockList);
+    @Override
+    public TsakResponse execute(Twitter twitter) throws TwitterException {
+        PagableResponseList<User> blockList = twitter.getBlocksList();
+        int remApiLimits = blockList.getRateLimitStatus().getRemaining();
+        TsakResponse tsakResponse = new TsakResponse(remApiLimits, blockList);
         tsakResponse.setCommandDetails(this.toString());
         return tsakResponse;
-	}
+    }
 
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     @Override
-	public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
-	    PagableResponseList<User> uList = (PagableResponseList<User>) tsakResponse.getResponseData();
-	    for (User user : uList) {
+    public void write(TsakResponse tsakResponse, BufferedWriter writer) throws IOException {
+        PagableResponseList<User> uList = (PagableResponseList<User>) tsakResponse.getResponseData();
+        for (User user : uList) {
             String userJson = new Gson().toJson(user);
             writer.append(userJson);
+            writer.newLine();
         }
-	}
+    }
 
     @Override
     public String toString() {
         return "CommandDumpBlockList []";
     }
- }
+}

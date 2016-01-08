@@ -1,6 +1,6 @@
 package org.projectspinoza.twitterswissarmyknife.command;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.projectspinoza.twitterswissarmyknife.util.TsakResponse;
@@ -33,5 +33,5 @@ public abstract class BaseCommand {
 	}
 	
 	public abstract TsakResponse execute(Twitter twitter) throws TwitterException;
-	public abstract void write(TsakResponse tsakResponse, FileWriter writer) throws IOException;
+	public abstract void write(TsakResponse tsakResponse, BufferedWriter bufferedWriter) throws IOException;
 }

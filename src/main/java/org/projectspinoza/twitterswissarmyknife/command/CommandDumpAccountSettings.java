@@ -1,6 +1,6 @@
 package org.projectspinoza.twitterswissarmyknife.command;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.projectspinoza.twitterswissarmyknife.util.TsakResponse;
@@ -25,9 +25,11 @@ public class CommandDumpAccountSettings extends BaseCommand {
     }
 
     @Override
-    public void write(TsakResponse tsakResponse, FileWriter writer) throws IOException {
+    public void write(TsakResponse tsakResponse, BufferedWriter writer)
+            throws IOException {
         String jsonSettings = new Gson().toJson(tsakResponse.getResponseData());
         writer.append(jsonSettings);
+        writer.newLine();
     }
 
     @Override
