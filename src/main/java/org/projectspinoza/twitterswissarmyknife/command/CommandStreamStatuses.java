@@ -16,8 +16,8 @@ public class CommandStreamStatuses extends BaseCommand {
 
     @Parameter(names = "-keywords", description = "Status containing Keywords.", required = true)
     private String keywords;
-    @Parameter(names = "-store", description = "Should store upcoming statuses.")
-    private String storeStreamingStatus;
+    @Parameter(names = "-store", description = "use parameter [-store] if you want to store streaming to output file")
+    private boolean storeStreaming = false;
 
     public String getKeywords() {
         return keywords;
@@ -27,12 +27,12 @@ public class CommandStreamStatuses extends BaseCommand {
         this.keywords = keywords;
     }
 
-    public String getStoreStreamingStatus() {
-        return storeStreamingStatus;
+    public boolean storeStreaming() {
+        return storeStreaming;
     }
 
-    public void setStoreStreamingStatus(String storeStreamingStatus) {
-        this.storeStreamingStatus = storeStreamingStatus;
+    public void setStoreStreaming(boolean storeStreamingStatus) {
+        this.storeStreaming = storeStreamingStatus;
     }
 
     @Override
@@ -46,5 +46,12 @@ public class CommandStreamStatuses extends BaseCommand {
         // TODO Auto-generated method stub
 
     }
+
+    @Override
+    public String toString() {
+        return "CommandStreamStatuses [keywords=" + keywords + ", storeStreamingStatus=" + storeStreaming + "]";
+    }
+    
+    
 
 }
