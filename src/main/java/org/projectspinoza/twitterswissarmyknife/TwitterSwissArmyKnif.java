@@ -128,20 +128,15 @@ public class TwitterSwissArmyKnif{
             BaseCommand baseCommand = getActiveCommand();
             bufferedWriter = new BufferedWriter(new FileWriter(new File(baseCommand.getOutputFile())));
             baseCommand.write(tsakResponse, bufferedWriter);
-            tsakResponse = null;
-            if (bufferedWriter != null) {
-                bufferedWriter.close();
-            }
-        } catch (IOException ioex) {
-            log.debug(ioex.getMessage());
-        } catch (NullPointerException npex) {
-            log.debug(npex.getMessage());
-        } finally {
-            if (bufferedWriter != null) {
+            bufferedWriter.close();
+        } catch (Exception ex) {
+            log.debug(ex.getMessage());
+        } finally{
+            if(bufferedWriter != null){
                 try {
                     bufferedWriter.close();
-                } catch (IOException ioex) {
-                    log.error("cannot close writer!!! {}", ioex.getMessage());
+                } catch (IOException ioex){
+                   //. TODO 
                 }
             }
         }
